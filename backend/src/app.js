@@ -10,14 +10,13 @@ import cors from 'cors';
 import { app, server } from './lib/socket.js';
 
 
-
 dotenv.config();
 connectCloudinary();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-  origin:"http://localhost:3000",
+  origin:["https://chat-app-lilac-nine.vercel.app", process.env.CLIENT_URL],
   credentials:true
 }))
 

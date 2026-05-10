@@ -17,7 +17,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
   connectSocket: (userId: string) => {
     if ( get().socket?.connected) return; // Prevent multiple connections
     const socket = io(
-      process.env.NODE_ENV === "development" ? "http://localhost:5001" :"/",
+      process.env.NODE_ENV === "development" ? "http://localhost:5001" :"https://chatty.up.railway.app",
       {
         query:{userId}, // Pass user ID if needed
         withCredentials: true,
