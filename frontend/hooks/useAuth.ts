@@ -28,6 +28,8 @@ export const useAuth = (skipQuery = false) => {
       disconnectSocket();
     }
   }, [data?.user?._id, isLoading]);
+
+
   const logoutMutation = useMutation({
     mutationFn: async () => {
       await apiClient.post("/auth/logout", {});
@@ -56,11 +58,13 @@ export const useAuth = (skipQuery = false) => {
     },
 
     onSuccess: (res) => {
+      
+      router.push("/")
       queryClient.setQueryData(["currentUser"], res.data);
 
       queryClient.invalidateQueries({ queryKey: ["currentUser"] });
 
-      router.push("/");
+    
       toast.success("Signup successful");
     },
     onError: (error) => {
