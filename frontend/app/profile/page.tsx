@@ -8,7 +8,7 @@ import Loading from "../loading";
 const Profile = async () => {
   const { user } = await apiClient.get("/auth/check-auth");
   if (!user) {
-    <Loading/>
+    return <Loading/>
   }
   
   return (
