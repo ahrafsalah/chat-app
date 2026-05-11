@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
 
-export const useAuth = () => {
+export const useAuth = (skipQuery = false) => {
   const { connectSocket, disconnectSocket } = useSocketStore();
   const queryClient = useQueryClient();
   const router = useRouter();
@@ -16,6 +16,7 @@ export const useAuth = () => {
     queryFn: async () => {
       return await apiClient.get("/auth/check-auth");
     },
+      enabled: !skipQuery,
   });
 
 
@@ -94,7 +95,9 @@ useEffect(() => {
       return res;
     },
     onSuccess: (data: any) => {
-      queryClient.setQueryData(["currentUser"], data?.user);
+queryClient.setQueryData(["currentUser"], {
+  user: data?.user,
+});
       queryClient.invalidateQueries({ queryKey: ["currentUser"] });
       router.refresh();
       toast.success("Profile updated successfully");

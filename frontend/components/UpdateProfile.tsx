@@ -7,7 +7,7 @@ import React, { useEffect, useState } from "react";
 const UpdataProfile = ({ user }: any) => {
   const [image, setImage] = useState<File | null>(null);
   const [fullName, setFullName] = useState("");
-  const {updateProfile} = useAuth();
+  const {updateProfile} = useAuth(true);
 
   const [preview, setPreview] = useState<string | null>(null);
 
@@ -96,7 +96,7 @@ const UpdataProfile = ({ user }: any) => {
                 "
               >
                 <img
-                  src={preview || user?.profilePic}
+                  src={preview || user?.profilePic || "/avatar.png"}
                   alt=""
                   className="
                     object-cover object-center
@@ -234,7 +234,11 @@ const UpdataProfile = ({ user }: any) => {
             <div className="flex items-center justify-between py-2 border-b border-zinc-700">
               {" "}
               <p>Member Since :</p>{" "}
-              <p>{new Date(user?.createdAt).toLocaleDateString()}</p>
+<p>
+  {user?.createdAt
+    ? new Date(user.createdAt).toLocaleDateString()
+    : "—"}
+</p>
             </div>
             <div className="flex items-center justify-between">
               {" "}

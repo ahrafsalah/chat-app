@@ -13,7 +13,7 @@ const Profile = async () => {
 
     return <UpdataProfile user={user} />;
   } catch (error) {
-    return <div>Error loading profile</div>;
+    return <p>Error loading profile</p>;
   }
 };
 
