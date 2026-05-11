@@ -11,33 +11,30 @@ export const useAuth = (skipQuery = false) => {
   const queryClient = useQueryClient();
   const router = useRouter();
 
-  const { data,isLoading } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["currentUser"],
     queryFn: async () => {
       return await apiClient.get("/auth/check-auth");
     },
-      enabled: !skipQuery,
+    enabled: !skipQuery,
   });
 
+  useEffect(() => {
+    const userId = data?.user?._id;
 
-useEffect(() => {
-    const userId = data?.user?._id; 
-    
     if (userId) {
       connectSocket(userId);
-    } else if (!isLoading) { 
-  
+    } else if (!isLoading) {
       disconnectSocket();
     }
-  }, [data?.user?._id, isLoading])
+  }, [data?.user?._id, isLoading]);
   const logoutMutation = useMutation({
     mutationFn: async () => {
       await apiClient.post("/auth/logout", {});
-      
     },
 
     onSuccess: () => {
-      queryClient.setQueryData(["currentUser"], null);
+      queryClient.clear();
       router.push("/login");
       disconnectSocket();
       toast.success("Logged out successfully");
@@ -59,9 +56,11 @@ useEffect(() => {
     },
 
     onSuccess: (res) => {
-      queryClient.invalidateQueries({ queryKey: ["currentUser"] });
-     
+      queryClient.setQueryData(["currentUser"], res.data);
 
+      queryClient.invalidateQueries({ queryKey: ["currentUser"] });
+
+      router.push("/");
       toast.success("Signup successful");
     },
     onError: (error) => {
@@ -78,12 +77,14 @@ useEffect(() => {
       return res;
     },
     onSuccess: (res) => {
-      console.log("Login successful:", res.data);
+      queryClient.setQueryData(["currentUser"], res.data);
+
       queryClient.invalidateQueries({ queryKey: ["currentUser"] });
+
       router.push("/");
       toast.success("Login successful");
-    
     },
+
     onError: (error) => {
       toast.error(error.message);
     },
@@ -95,9 +96,9 @@ useEffect(() => {
       return res;
     },
     onSuccess: (data: any) => {
-queryClient.setQueryData(["currentUser"], {
-  user: data?.user,
-});
+      queryClient.setQueryData(["currentUser"], {
+        user: data?.user,
+      });
       queryClient.invalidateQueries({ queryKey: ["currentUser"] });
       router.refresh();
       toast.success("Profile updated successfully");

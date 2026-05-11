@@ -251,11 +251,8 @@ useEffect(() => {
               <button
                 type="submit"
                 className="
-                  w-full
-                  p-3
-                  bg-primary
-                  rounded-lg
-                  cursor-pointer
+              btn btn-primary
+              w-full
 
                 "
                 disabled={isLoading}
