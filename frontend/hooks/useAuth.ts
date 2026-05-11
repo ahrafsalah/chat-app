@@ -32,6 +32,7 @@ useEffect(() => {
   const logoutMutation = useMutation({
     mutationFn: async () => {
       await apiClient.post("/auth/logout", {});
+      
     },
 
     onSuccess: () => {
@@ -48,14 +49,17 @@ useEffect(() => {
       email: string;
       password: string;
     }) => {
-      await apiClient.post("/auth/signUp", {
+      const res = await apiClient.post("/auth/signUp", {
         email: userData.email,
         name: userData.fullName,
         password: userData.password,
       });
+      return res;
     },
-    onSuccess: () => {
+
+    onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: ["currentUser"] });
+     
 
       toast.success("Signup successful");
     },
@@ -73,10 +77,11 @@ useEffect(() => {
       return res;
     },
     onSuccess: (res) => {
+      console.log("Login successful:", res.data);
       queryClient.invalidateQueries({ queryKey: ["currentUser"] });
       router.push("/");
       toast.success("Login successful");
-      document.cookie = `token=${res.token}; path=/; max-age=604800; secure; samesite=lax`;
+    
     },
     onError: (error) => {
       toast.error(error.message);

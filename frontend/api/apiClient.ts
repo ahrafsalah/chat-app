@@ -1,5 +1,5 @@
-
-const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5001/api";
+const baseURL =
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5001/api";
 
 export const apiClient = {
   async request(endpoint: string, options: RequestInit = {}) {
@@ -8,14 +8,18 @@ export const apiClient = {
     const isFormData = options.body instanceof FormData;
 
     const isServer = typeof window === "undefined";
-    const headers : Record<string, string> = isFormData ? options.headers as Record<string, string> || {} : { "Content-Type": "application/json", ...(options.headers as Record<string, string>)  };
+    const headers: Record<string, string> = isFormData
+      ? (options.headers as Record<string, string>) || {}
+      : {
+          "Content-Type": "application/json",
+          ...(options.headers as Record<string, string>),
+        };
 
-    if(isServer){
-      const cookiesStore = await (await import ("next/headers")).cookies() 
-      const token = cookiesStore.get("token")?.value
-      
-        headers["cookie"] = token ?`token=${token}`:""
-      
+    if (isServer) {
+      const cookiesStore = await (await import("next/headers")).cookies();
+      const token = cookiesStore.get("token")?.value;
+
+      headers["cookie"] = token ? `token=${token}` : "";
     }
 
     const response = await fetch(url, {
@@ -24,7 +28,15 @@ export const apiClient = {
       credentials: "include",
     });
 
-    const data = await response.json();
+    const text = await response.text();
+
+    let data: any = {};
+
+    try {
+      data = text ? JSON.parse(text) : {};
+    } catch {
+      data = { message: text };
+    }
 
     if (!response.ok) {
       throw new Error(data.message || "API request failed");
@@ -52,4 +64,4 @@ export const apiClient = {
   delete(endpoint: string, options: RequestInit = {}) {
     return this.request(endpoint, { ...options, method: "DELETE" });
   },
-}
+};
