@@ -1,15 +1,19 @@
 "use client";
 
+import Loading from "@/app/loading";
 import { useAuth } from "@/hooks/useAuth";
 import { Camera, Mail, User } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
-const UpdataProfile = ({ user }: any) => {
+const UpdateProfile = () => {
   const [image, setImage] = useState<File | null>(null);
   const [fullName, setFullName] = useState("");
-  const {updateProfile} = useAuth(true);
-
+  const {updateProfile, data} = useAuth();
   const [preview, setPreview] = useState<string | null>(null);
+
+  const user = data?.user;
+
+
 
   useEffect(() => {
     if (!image) {
@@ -24,7 +28,7 @@ const UpdataProfile = ({ user }: any) => {
   }, [image]);
 
   useEffect(() => {
-    if (user?.name) setFullName(user?.name);
+    if (user?.name) setFullName(user?.name ?? "");
   }, [user?.name]);
 
   useEffect(() => {
@@ -42,6 +46,10 @@ const UpdataProfile = ({ user }: any) => {
 
     updateProfile.mutate(formData);
   };
+
+    if(!user) {
+    return <Loading/>
+  }
   return (
     <div
       className="
@@ -162,7 +170,7 @@ const UpdataProfile = ({ user }: any) => {
                   type="text"
                   id="fullName"
                   name="fullName"
-                  value={fullName}
+                  value={fullName || ""}
                   onChange={(e) => setFullName(e.target.value)}
                   className="
                     w-full
@@ -190,7 +198,7 @@ const UpdataProfile = ({ user }: any) => {
                   type="email"
                   id="email"
                   name="email"
-                  value={user?.email}
+               value={user?.email || ""}
                   readOnly
                   className="
                     w-full
@@ -236,7 +244,7 @@ const UpdataProfile = ({ user }: any) => {
               <p>Member Since :</p>{" "}
 <p>
   {user?.createdAt
-    ? new Date(user.createdAt).toLocaleDateString()
+    ? new Date(user.createdAt).toISOString().split("T")[0]
     : "—"}
 </p>
             </div>
@@ -251,4 +259,4 @@ const UpdataProfile = ({ user }: any) => {
   );
 };
 
-export default UpdataProfile;
+export default UpdateProfile;
