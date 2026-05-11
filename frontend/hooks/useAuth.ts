@@ -33,6 +33,7 @@ useEffect(() => {
     mutationFn: async () => {
       await apiClient.post("/auth/logout", {});
     },
+
     onSuccess: () => {
       queryClient.setQueryData(["currentUser"], null);
       router.push("/login");
@@ -65,15 +66,17 @@ useEffect(() => {
 
   const signinMutation = useMutation({
     mutationFn: async (userData: { email: string; password: string }) => {
-      await apiClient.post("/auth/signIn", {
+      const res = await apiClient.post("/auth/signIn", {
         email: userData.email,
         password: userData.password,
       });
+      return res;
     },
-    onSuccess: () => {
+    onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: ["currentUser"] });
       router.push("/");
       toast.success("Login successful");
+      document.cookie = `token=${res.token}; path=/; max-age=604800; secure; samesite=lax`;
     },
     onError: (error) => {
       toast.error(error.message);
