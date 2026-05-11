@@ -6,13 +6,15 @@ import Loading from "../loading";
 
 
 const Profile = async () => {
-  const { user } = await apiClient.get("/auth/check-auth");
-  if (!user) {
-    return <Loading/>
+  try {
+    const { user } = await apiClient.get("/auth/check-auth");
+
+    if (!user) return <Loading />;
+
+    return <UpdataProfile user={user} />;
+  } catch (error) {
+    return <div>Error loading profile</div>;
   }
-  
-  return (
-    <UpdataProfile user={user} />
-  );
 };
+
 export default Profile;
