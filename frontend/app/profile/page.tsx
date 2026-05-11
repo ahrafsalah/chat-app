@@ -9,6 +9,8 @@ const Profile = async () => {
   try {
     const { user } = await apiClient.get("/auth/check-auth");
 
+    console.log("Fetched user data:", user); // Debug logss
+
     if (!user) return <Loading />;
 
     return <UpdataProfile user={user} />;
