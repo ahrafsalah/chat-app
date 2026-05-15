@@ -5,6 +5,7 @@ import { Toaster } from "react-hot-toast";
 import QueryProvider from "@/components/QueryProvider";
 import NavBar from "@/components/NavBar";
 import ThemeProvider from "@/components/ThemeProvider";
+import AuthProvider from "@/components/AuthProvider";
 
 
 const geistSans = Geist({
@@ -32,15 +33,17 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-
-        <ThemeProvider>
-        <QueryProvider>
-        <Toaster/>
-        <NavBar/>
-        {children}
-        </QueryProvider>
-        </ThemeProvider>
-
+   
+          <ThemeProvider>
+            <QueryProvider>
+                   <AuthProvider>
+              <Toaster />
+              <NavBar />
+              {children}
+              </AuthProvider>
+            </QueryProvider>
+          </ThemeProvider>
+      
       </body>
     </html>
   );
