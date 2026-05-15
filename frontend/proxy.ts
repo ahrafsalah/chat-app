@@ -1,21 +1,28 @@
-import { NextRequest, NextResponse } from "next/server"
-const proxy = async (request: NextRequest) => { 
-  const token = request.cookies.get("token")?.value;
-  const { pathname } = request.nextUrl;
+import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
 
-  const isAuthPage = pathname === "/login" || pathname === "/signup";
-  if (!token && !isAuthPage) {
-    return NextResponse.redirect(new URL("/login", request.url));
+// 1. تحديد المسارات العامة
+const isPublicRoute = createRouteMatcher(['/login(.*)', '/signup(.*)']);
+
+export default clerkMiddleware(async (auth, request) => {
+  const { userId } = await auth();
+
+  // 2. إذا لم يكن هناك مستخدم وهو يحاول دخول مسار خاص
+  if (!userId && !isPublicRoute(request)) {
+    // يمكنك استخدام redirectToSignIn لإرجاع المستخدم لصفحة اللوجن
+    return (await auth()).redirectToSignIn();
   }
-  if (token && isAuthPage) {
-    return NextResponse.redirect(new URL("/", request.url));
+
+  // 3. إذا كان المستخدم مسجل دخول ويحاول دخول صفحات اللوجن (التحويل العكسي)
+  if (userId && isPublicRoute(request)) {
+    const home = new URL('/', request.url);
+    return NextResponse.redirect(home);
   }
-   
-  return NextResponse.next()
-  
-}
+});
+
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+  matcher: [
+    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    '/(api|trpc)(.*)',
+  ],
 };
-
-export default proxy
